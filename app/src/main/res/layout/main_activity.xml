@@ -3,5 +3,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+<Button
+    android:layout_gravity="center"
+    android:id="@+id/button"
+    android:layout_width="200dp"
+    android:layout_height="50dp"
+    android:text="Click"
+    android:textColor="@color/white"
+    android:background="@color/black"/>
 
 </LinearLayout>
