@@ -25,4 +25,9 @@
         android:max="80"
         android:progress="50"
         android:layout_margin="16dp" />
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:id="@+id/buttoncopy"
+        android:layout_gravity="center_horizontal"/>
 </LinearLayout>

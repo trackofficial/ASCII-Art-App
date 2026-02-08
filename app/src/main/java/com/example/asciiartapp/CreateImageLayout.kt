@@ -1,16 +1,21 @@
 package com.example.asciiartapp
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-    //Пометки делал для себя
+
+//Пометки делал для себя
 class CreateImageLayout : ComponentActivity() {
     private lateinit var original: Bitmap
     private var currentBitmap: Bitmap? = null
@@ -18,12 +23,17 @@ class CreateImageLayout : ComponentActivity() {
     private val charsetLow    = " .:-=+*#@"      // 9
     private val charsetMedium = " .,:;irsXA"     // 10
     private val charsetHigh   = " .:-=+*#%@"     // 10
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.create_screen)
         val seekbar = findViewById<SeekBar>(R.id.seekBar)
         val asciiTextView = findViewById<TextView>(R.id.text_asciiart)
-
+        val copybutton = findViewById<Button>(R.id.buttoncopy)
+        copybutton.setOnClickListener {
+            val textToCopy = asciiTextView.text.toString()
+            copyToClipboard(textToCopy)
+        }
         // 1. Достаём Uri из интента
         val uriString = intent.getStringExtra("imageUri")
         if (uriString.isNullOrEmpty()) {
@@ -72,6 +82,7 @@ class CreateImageLayout : ComponentActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
+
     private fun loadBitmapFromUri(uri: Uri): Bitmap? {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -86,6 +97,7 @@ class CreateImageLayout : ComponentActivity() {
             null
         }
     }
+
     private fun pickCharset(width: Int): String {
         return when {
             width < 40  -> charsetLow
@@ -93,6 +105,7 @@ class CreateImageLayout : ComponentActivity() {
             else        -> charsetHigh
         }
     }
+
     fun makeLowQualityCopy(
         bitmap: Bitmap,
         targetWidth: Int = 100,
@@ -103,6 +116,7 @@ class CreateImageLayout : ComponentActivity() {
         val scaled = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
         return scaled.copy(config, false)
     }
+
     fun bitmapToAscii(
         bitmap: Bitmap,
         width: Int = 80,
@@ -129,4 +143,12 @@ class CreateImageLayout : ComponentActivity() {
         }
         return sb.toString()
     }
+
+    private fun copyToClipboard(text: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("label", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "Текст скопирован", Toast.LENGTH_SHORT).show()
+    }
 }
+
