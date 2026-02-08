@@ -14,6 +14,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.core.net.toUri
 
 //Пометки делал для себя
 class CreateImageLayout : ComponentActivity() {
@@ -41,7 +42,7 @@ class CreateImageLayout : ComponentActivity() {
             finish()
             return
         }
-        val uri = Uri.parse(uriString)
+        val uri = uriString.toUri()
         // 2. Загружаем bitmap из Uri
         val sourceBitmap = loadBitmapFromUri(uri)
         if (sourceBitmap == null) {
