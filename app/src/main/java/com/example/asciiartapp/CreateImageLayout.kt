@@ -49,15 +49,14 @@ class CreateImageLayout : ComponentActivity() {
             finish()
             return
         }
-        // 3. Переводим в RGB, чтобы можно было безопасно вызывать getPixel()
+        // 3. Переводим в RGB и Создаём "оригинал" нужного размера для показа и дальнейшей работы
         val mutableBitmap = sourceBitmap.copy(Bitmap.Config.ARGB_8888, false)
-        // 4. Создаём "оригинал" нужного размера для показа и дальнейшей работы
         val targetHeight = 800
         val aspectRatio = mutableBitmap.width.toFloat() / mutableBitmap.height.toFloat()
         val targetWidth = (targetHeight * aspectRatio).toInt()
         original = Bitmap.createScaledBitmap(mutableBitmap, targetWidth, targetHeight, true)
         currentBitmap = original
-        // 5. Стартовое значение seekBar и первый ASCII
+        // 4. Стартовое значение seekBar и первый ASCII
         if (seekbar.progress == 0) seekbar.progress = 50
         val startWidth = seekbar.progress
 
@@ -67,7 +66,7 @@ class CreateImageLayout : ComponentActivity() {
             width = startWidth,
             chars = pickCharset(startWidth)
         )
-        // 6. Обновление при движении ползунка
+        // 5. Обновление при движении ползунка
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val w = progress.coerceAtLeast(10) // минимум 10
@@ -117,6 +116,7 @@ class CreateImageLayout : ComponentActivity() {
         return scaled.copy(config, false)
     }
 
+    //Основаня функция конвертирования
     fun bitmapToAscii(
         bitmap: Bitmap,
         width: Int = 80,
@@ -144,6 +144,7 @@ class CreateImageLayout : ComponentActivity() {
         return sb.toString()
     }
 
+    //Функция для копирования текста
     private fun copyToClipboard(text: String) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("label", text)

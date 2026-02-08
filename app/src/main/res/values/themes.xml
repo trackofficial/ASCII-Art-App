@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- В файле res/values/themes.xml (или styles.xml) -->
+    <style name="Theme.ASCIIArtApp" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Основной цвет для ProgressBar -->
+        <item name="colorAccent">@color/black</item>
 
-    <style name="Theme.ASCIIArtApp" parent="android:Theme.Material.Light.NoActionBar" />
+        <!-- Альтернативный метод: для более точного контроля -->
+        <item name="colorControlActivated">@color/white</item>
+    </style>
+
 </resources>
