@@ -9,7 +9,7 @@ A simple Bitmap image converter to ASCII art on Kotlin. The function accepts a `
 - Customizable character set from dark to light.
 - Suitable for Android projects (uses `android.graphics.Bitmap`).
 
-## How the algorithm works
+## How it works
 
 1. Image scaling  
    `Bitmap.createScaledBitmap(src, dstWidth, dstHeight, filter)` is used to create a scaled-down copy of the source with the desired width and calculated height to maintain proportions.
