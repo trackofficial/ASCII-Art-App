@@ -37,7 +37,7 @@
                 android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="80"
+                android:max="100"
                 android:progress="50"
                 android:layout_margin="16dp" />
             <Button
@@ -46,6 +46,15 @@
                 android:layout_width="200dp"
                 android:layout_height="50dp"
                 android:text="Copy"
+                android:textColor="@color/white"
+                android:background="@color/black"/>
+            <Button
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:id="@+id/buttonsave"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:text="Save"
                 android:textColor="@color/white"
                 android:background="@color/black"/>
         </LinearLayout>

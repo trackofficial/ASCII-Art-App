@@ -2,12 +2,14 @@ package com.example.asciiartapp
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.SeekBar
@@ -15,6 +17,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.net.toUri
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
+import android.graphics.Color
+import android.view.View
 
 //Пометки делал для себя
 class CreateImageLayout : ComponentActivity() {
@@ -31,9 +39,23 @@ class CreateImageLayout : ComponentActivity() {
         val seekbar = findViewById<SeekBar>(R.id.seekBar)
         val asciiTextView = findViewById<TextView>(R.id.text_asciiart)
         val copybutton = findViewById<Button>(R.id.buttoncopy)
+        val savebutton = findViewById<Button>(R.id.buttonsave)
         copybutton.setOnClickListener {
             val textToCopy = asciiTextView.text.toString()
             copyToClipboard(textToCopy)
+        }
+        savebutton.setOnClickListener {
+            val uri = saveAsciiTextViewAsPng(
+                context = this,
+                textView = asciiTextView,
+                fileName = "ascii_art_${System.currentTimeMillis()}",
+                paddingPx = 32f // тут регулируешь размер отступа
+            )
+            if (uri != null) {
+                Toast.makeText(this, "PNG сохранён в галерею", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Ошибка при сохранении PNG", Toast.LENGTH_SHORT).show()
+            }
         }
         // 1. Достаём Uri из интента
         val uriString = intent.getStringExtra("imageUri")
@@ -152,5 +174,58 @@ class CreateImageLayout : ComponentActivity() {
         clipboard.setPrimaryClip(clip)
         Toast.makeText(this, "Текст скопирован", Toast.LENGTH_SHORT).show()
     }
+    private fun textViewToBitmapWithPadding(
+        textView: TextView,
+        paddingPx: Float = 32f
+    ): Bitmap {
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        textView.measure(widthSpec, heightSpec)
+        val contentWidth = textView.measuredWidth
+        val contentHeight = textView.measuredHeight
+        val bmpWidth = (contentWidth + paddingPx * 2).toInt().coerceAtLeast(1)
+        val bmpHeight = (contentHeight + paddingPx * 2).toInt().coerceAtLeast(1)
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.BLACK)
+        canvas.save()
+        canvas.translate(paddingPx, paddingPx)
+        textView.layout(0, 0, contentWidth, contentHeight)
+        textView.draw(canvas)
+        canvas.restore()
+        return bitmap
+    }
+    private fun saveBitmapPngToGallery(
+        context: Context,
+        bitmap: Bitmap,
+        fileName: String
+    ): Uri? {
+        val resolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "$fileName.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                Environment.DIRECTORY_PICTURES + "/AsciiArt"
+            )
+        }
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        if (uri != null) {
+            resolver.openOutputStream(uri)?.use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        }
+        return uri
+    }
+    private fun saveAsciiTextViewAsPng(
+        context: Context,
+        textView: TextView,
+        fileName: String,
+        paddingPx: Float = 32f
+    ): Uri? {
+        val bitmap = textViewToBitmapWithPadding(textView, paddingPx)
+        return saveBitmapPngToGallery(context, bitmap, fileName)
+    }
+
 }
 
